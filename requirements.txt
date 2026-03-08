@@ -9,6 +9,9 @@ beautifulsoup4>=4.11.0
 # 환경변수 로드
 python-dotenv>=1.0.0
 
+# 네이버 커머스 API 서명
+bcrypt>=4.0.0
+
 # Google API (선택 - Sheets 저장용)
 google-api-python-client>=2.100.0
 google-auth-httplib2>=0.1.0
