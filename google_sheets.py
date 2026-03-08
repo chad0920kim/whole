@@ -61,12 +61,19 @@ class GoogleSheetsManager:
     def credentials(self):
         """인증 정보 (지연 로딩)"""
         if self._credentials is None:
-            if not self.credentials_file:
-                raise ValueError("GOOGLE_CREDENTIALS_FILE 환경변수 또는 credentials_file 필요")
-
-            if self.use_oauth:
+            # 환경변수에 서비스 계정 JSON이 있으면 우선 사용 (CI/CD 환경)
+            service_account_json = os.getenv("GOOGLE_SERVICE_ACCOUNT_JSON")
+            if service_account_json:
+                from google.oauth2 import service_account
+                info = json.loads(service_account_json)
+                self._credentials = service_account.Credentials.from_service_account_info(
+                    info, scopes=self.SCOPES
+                )
+            elif self.use_oauth:
                 self._credentials = self._get_oauth_credentials()
             else:
+                if not self.credentials_file:
+                    raise ValueError("GOOGLE_CREDENTIALS_FILE 환경변수 또는 credentials_file 필요")
                 from google.oauth2 import service_account
                 self._credentials = service_account.Credentials.from_service_account_file(
                     self.credentials_file,

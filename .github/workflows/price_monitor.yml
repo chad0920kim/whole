@@ -23,24 +23,11 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Restore Google credentials
-        run: |
-          echo "${{ secrets.GOOGLE_OAUTH_CREDENTIALS }}" | base64 -d > oauth-credentials.json
-          echo "${{ secrets.GOOGLE_OAUTH_TOKEN }}" | base64 -d > token.json
-
       - name: Run price monitor
         env:
           DOMEGGOOK_API_KEY: ${{ secrets.DOMEGGOOK_API_KEY }}
           NAVER_COMMERCE_CLIENT_ID: ${{ secrets.NAVER_COMMERCE_CLIENT_ID }}
           NAVER_COMMERCE_CLIENT_SECRET: ${{ secrets.NAVER_COMMERCE_CLIENT_SECRET }}
           GOOGLE_SHEET_ID: ${{ secrets.GOOGLE_SHEET_ID }}
-          GOOGLE_CREDENTIALS_FILE: oauth-credentials.json
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
         run: python "@price_monitor.py" --once
-
-      - name: Update Google token (refresh 후 재저장)
-        if: always()
-        run: |
-          if [ -f token.json ]; then
-            NEW_TOKEN=$(base64 -w 0 token.json)
-            echo "::notice::token.json이 갱신되었습니다. 필요시 GOOGLE_OAUTH_TOKEN Secret을 업데이트하세요."
-          fi

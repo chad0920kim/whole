@@ -5,6 +5,7 @@ oauth-credentials.json
 token.json
 *credentials*.json
 *secret*.json
+gen-lang-*.json
 
 # Python
 __pycache__/
