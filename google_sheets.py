@@ -63,11 +63,17 @@ class GoogleSheetsManager:
         if self._credentials is None:
             # 환경변수에 서비스 계정 JSON이 있으면 우선 사용 (CI/CD 환경)
             service_account_json = os.getenv("GOOGLE_SERVICE_ACCOUNT_JSON")
+            service_account_file = os.getenv("GOOGLE_SERVICE_ACCOUNT_FILE")
             if service_account_json:
                 from google.oauth2 import service_account
                 info = json.loads(service_account_json)
                 self._credentials = service_account.Credentials.from_service_account_info(
                     info, scopes=self.SCOPES
+                )
+            elif service_account_file and Path(service_account_file).exists():
+                from google.oauth2 import service_account
+                self._credentials = service_account.Credentials.from_service_account_file(
+                    service_account_file, scopes=self.SCOPES
                 )
             elif self.use_oauth:
                 self._credentials = self._get_oauth_credentials()
